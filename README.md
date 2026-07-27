@@ -24,3 +24,79 @@ The tool is driven by command-line arguments for dynamic targeting.
 **Syntax:**
 ```bash
 python3 scanner.py <TARGET_IP> -s <START_PORT> -e <END_PORT> -t <THREADS> -o <OUTPUT_FILE>
+
+## 🌐 Web Directory Brute Forcer
+
+This project extends my reconnaissance toolkit by performing **web directory enumeration** after discovering HTTP or HTTPS services using my Port Scanner.
+
+The objective is to automate the discovery of hidden or publicly accessible directories and files that may not be immediately visible through standard navigation.
+
+---
+
+### Lab Environment
+
+To ensure testing was performed safely and ethically, all development and validation took place inside a self-hosted virtual lab.
+
+**Infrastructure**
+
+- Oracle VirtualBox (Hypervisor)
+- Kali Linux (Attacking Machine)
+- Ubuntu Server (Target Machine)
+- Docker
+- OWASP Juice Shop (Intentionally Vulnerable Web Application)
+
+The Ubuntu Server was configured from scratch before Docker was installed. The OWASP Juice Shop application was then deployed inside a Docker container and verified to be accessible from the Kali Linux virtual machine before testing began.
+
+---
+
+### Testing Results
+
+The Web Directory Brute Forcer successfully enumerated **directories/endpoints** on the OWASP Juice Shop application.
+
+The majority of discovered resources returned an **HTTP 200 (OK)** response, indicating that the requested resources were accessible.
+
+Depending on the application being tested, directory enumeration may also encounter response codes such as:
+
+| Status Code | Meaning |
+|-------------|---------|
+| 200 | Resource found |
+| 301 | Permanent redirect |
+| 302 | Temporary redirect |
+| 307 | Temporary redirect |
+| 308 | Permanent redirect |
+| 401 | Authentication required |
+| 403 | Access forbidden |
+| 404 | Resource not found |
+| 405 | Method not allowed |
+| 429 | Rate limited |
+| 500 | Internal server error |
+| 502 | Bad gateway |
+| 503 | Service unavailable |
+
+---
+
+### Skills Demonstrated
+
+- Python scripting
+- Web reconnaissance
+- Directory enumeration
+- HTTP protocol analysis
+- Virtual lab deployment
+- Docker container deployment
+- Ubuntu Server administration
+- Kali Linux
+- Ethical penetration testing methodology
+
+---
+
+### Disclaimer
+
+This project was developed and tested **exclusively within a self-hosted, isolated laboratory environment** using the intentionally vulnerable **OWASP Juice Shop** application. No unauthorized systems, networks, or third-party infrastructure were targeted during development or testing.
+
+---
+
+### 💻 Usage Instructions
+
+**Syntax:**
+```bash
+python3 dir_bruteforcer.py [http://192.168.1.10:3000](http://192.168.1.10:3000) /usr/share/wordlists/dirb/common.txt
