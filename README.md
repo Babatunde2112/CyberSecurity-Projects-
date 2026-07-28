@@ -6,97 +6,61 @@ The projects within this repository bridge the gap between academic theory and p
 
 ---
 
-## 🛠️ Project 1: Multithreaded Network Scanner & Banner Grabber (`scanner.py`)
+## 🔬 Lab Environment & Ethical Testing
 
-A high-speed, custom-built reconnaissance tool written in Python. This script performs raw socket port scanning to identify open pathways on a target machine, utilizing multi-threading to ensure rapid execution. Beyond basic scanning, it performs active banner grabbing to identify specific software versions running on open ports, aiding in vulnerability discovery.
+To ensure testing was performed safely and ethically, all development and validation took place inside a self-hosted virtual lab. No unauthorized systems, networks, or third-party infrastructure were targeted during development or testing.
 
-### 🌟 Key Features
+**Infrastructure Used:**
+*   **Hypervisor:** Oracle VirtualBox
+*   **Attacking Machine:** Kali Linux
+*   **Target Machine:** Ubuntu Server LTS
+*   **Containerization:** Docker
+*   **Target Application:** OWASP Juice Shop (Intentionally Vulnerable Web App)
+
+The Ubuntu Server was configured from scratch, and the OWASP Juice Shop application was deployed inside a Docker container. Connectivity and routing were verified across a custom NAT Network prior to tool execution.
+
+---
+
+## 🗂️ Portfolio Projects
+
+### 🛠️ Project 1: Multithreaded Network Scanner & Banner Grabber (`scanner.py`)
+A high-speed, custom-built reconnaissance tool written in Python. This script performs raw socket port scanning to identify open pathways on a target machine. Beyond basic scanning, it performs active banner grabbing to identify specific software versions running on open ports, aiding in initial vulnerability discovery.
+
+**Internal Features & Technical Capabilities:**
 *   **High-Speed Concurrency:** Utilizes Python's `threading` and `Queue` modules to execute concurrent port checks, bypassing the slow, linear approach of traditional script execution.
 *   **Active Banner Grabbing:** Implements socket `recv(1024)` logic with custom timeouts to capture service headers (e.g., extracting `SSH-2.0-OpenSSH` instead of just identifying Port 22).
 *   **Intelligent Service Mapping:** Incorporates a fallback dictionary for common ports. If a service intentionally suppresses its banner, the script automatically maps the port to its standard protocol (e.g., mapping Port 80 to HTTP).
 *   **Graceful Error Handling:** Uses `connect_ex()` for silent error management during closed-port encounters, ensuring the script runs flawlessly without crashing on strict firewalls.
 *   **Automated Reporting:** Features an `-o` flag to seamlessly export structured scan results to a text file for post-engagement analysis.
 
-### 💻 Usage Instructions
-
-The tool is driven by command-line arguments for dynamic targeting. 
-
-**Syntax:**
+**Usage Syntax:**
 ```bash
 python3 scanner.py <TARGET_IP> -s <START_PORT> -e <END_PORT> -t <THREADS> -o <OUTPUT_FILE>
 
-## 🌐 Web Directory Brute Forcer
+```
 
-This project extends my reconnaissance toolkit by performing **web directory enumeration** after discovering HTTP or HTTPS services using my Port Scanner.
+### 🌐 Project 2: Web Directory Brute Forcer (`dir_bruteforcer.py`)
 
-The objective is to automate the discovery of hidden or publicly accessible directories and files that may not be immediately visible through standard navigation.
+A multithreaded web reconnaissance tool written in Python that performs automated directory enumeration against HTTP/HTTPS services. Designed to complement my Network Scanner, this utility discovers hidden directories, administrative panels, exposed files, and other accessible resources that are not immediately visible through standard web navigation.
 
----
+**Internal Features & Technical Capabilities:**
+* **HTTP Response Code Analysis:** Automatically evaluates server responses to categorize discovered resources, distinguishing between accessible pages (200 OK), redirects (301/302), forbidden content (403), and filtering out invalid paths (404).
+* **Multithreaded Enumeration:** Utilizes Python's `threading` and `Queue` modules to concurrently process large wordlists, significantly improving enumeration speed.
+* **Rate-Limit Throttling:** Supports configurable delays between requests to emulate realistic traffic patterns and reduce the likelihood of triggering server-side rate limiting (429 Too Many Requests).
+* **Custom Wordlist Support:** Accepts user-defined wordlists through command-line arguments, allowing compatibility with common security wordlists such as DIRB and SecLists.
+* **Robust Error Handling:** Gracefully manages connection failures, timeouts, and interrupted requests to ensure reliable execution during scans.
 
-### Lab Environment
+**Testing Results:**
+The tool was successfully validated inside a self-hosted penetration testing lab built using Oracle VirtualBox. The lab consisted of a Kali Linux attack machine and an Ubuntu Server target running Docker with the intentionally vulnerable **OWASP Juice Shop** application. During testing, the scanner successfully enumerated approximately **1,976 candidate paths**, identifying numerous accessible resources (HTTP 200), redirects (301/302), and intentionally restricted directories (403), demonstrating accurate response classification.
 
-To ensure testing was performed safely and ethically, all development and validation took place inside a self-hosted virtual lab.
+**Usage Syntax:**
 
-**Infrastructure**
-
-- Oracle VirtualBox (Hypervisor)
-- Kali Linux (Attacking Machine)
-- Ubuntu Server (Target Machine)
-- Docker
-- OWASP Juice Shop (Intentionally Vulnerable Web Application)
-
-The Ubuntu Server was configured from scratch before Docker was installed. The OWASP Juice Shop application was then deployed inside a Docker container and verified to be accessible from the Kali Linux virtual machine before testing began.
-
----
-
-### Testing Results
-
-The Web Directory Brute Forcer successfully enumerated **directories/endpoints** on the OWASP Juice Shop application.
-
-The majority of discovered resources returned an **HTTP 200 (OK)** response, indicating that the requested resources were accessible.
-
-Depending on the application being tested, directory enumeration may also encounter response codes such as:
-
-| Status Code | Meaning |
-|-------------|---------|
-| 200 | Resource found |
-| 301 | Permanent redirect |
-| 302 | Temporary redirect |
-| 307 | Temporary redirect |
-| 308 | Permanent redirect |
-| 401 | Authentication required |
-| 403 | Access forbidden |
-| 404 | Resource not found |
-| 405 | Method not allowed |
-| 429 | Rate limited |
-| 500 | Internal server error |
-| 502 | Bad gateway |
-| 503 | Service unavailable |
-
----
-
-### Skills Demonstrated
-
-- Python scripting
-- Web reconnaissance
-- Directory enumeration
-- HTTP protocol analysis
-- Virtual lab deployment
-- Docker container deployment
-- Ubuntu Server administration
-- Kali Linux
-- Ethical penetration testing methodology
-
----
-
-### Disclaimer
-
-This project was developed and tested **exclusively within a self-hosted, isolated laboratory environment** using the intentionally vulnerable **OWASP Juice Shop** application. No unauthorized systems, networks, or third-party infrastructure were targeted during development or testing.
-
----
-
-### 💻 Usage Instructions
-
-**Syntax:**
 ```bash
-python3 dir_bruteforcer.py [http://192.168.1.10:3000](http://192.168.1.10:3000) /usr/share/wordlists/dirb/common.txt
+python3 dir_bruteforcer.py http://192.168.1.10:3000 /usr/share/wordlists/dirb/common.txt
+```
+
+**🧠 Skills Demonstrated**
+* **Programming & Scripting:** Python CLI application development, multithreading, queue management, and exception handling.
+* **Networking Protocols:** HTTP/HTTPS request handling, status code interpretation, and web application reconnaissance.
+* **System Administration:** Oracle VirtualBox virtualization, Ubuntu Server deployment, Docker containerization, and Kali Linux operations.
+* **Security Methodology:** Web directory enumeration, attack surface mapping, reconnaissance automation, and ethical penetration testing practices.
